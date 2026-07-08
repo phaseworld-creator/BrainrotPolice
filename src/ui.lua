@@ -19,14 +19,10 @@ local TabList = MainFrame.tablist
 
 local HideButton = Topbar.hidebtn
 
--- =========================================================
---  FIXED & DYNAMICALLY GENERATING THE TOOLS TAB AND FRAME
--- =========================================================
--- Create the Frame Container for Tools
 local toolsFrame = Instance.new("ScrollingFrame")
 toolsFrame.Name = "toolsFrame"
 toolsFrame.Size = UDim2.new(1, 0, 1, 0)
-toolsFrame.Position = UDim2.new(0.5, 0, 1, 0) -- Hidden position by default
+toolsFrame.Position = UDim2.new(0.5, 0, 1, 0)
 toolsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 toolsFrame.BackgroundTransparency = 1
 toolsFrame.BorderSizePixel = 0
@@ -34,7 +30,6 @@ toolsFrame.ScrollBarThickness = 2
 toolsFrame.Visible = false
 toolsFrame.Parent = SectionContainers
 
--- Add Layout to Tools Frame to stack buttons nicely
 local uiListLayout = Instance.new("UIListLayout")
 uiListLayout.Padding = UDim.new(0, 5)
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -46,18 +41,20 @@ uiPadding.PaddingLeft = UDim.new(0, 10)
 uiPadding.PaddingRight = UDim.new(0, 10)
 uiPadding.Parent = toolsFrame
 
--- Create the Tab Button safely
-local ToolsTab = TabList:FindFirstChild("SettingsTab"):Clone()
+local TemplateTab = TabList:FindFirstChild("SettingsTab") or TabList:FindFirstChild("HomeTab")
+local ToolsTab = TemplateTab:Clone()
 ToolsTab.Name = "ToolsTab"
-ToolsTab.BackgroundTransparency = 1 -- Fix unselected state blending
+ToolsTab.BackgroundTransparency = 1 
+ToolsTab.Size = TemplateTab.Size
+ToolsTab.LayoutOrder = TemplateTab.LayoutOrder + 1
 ToolsTab.Parent = TabList
 
--- Explicitly force text updating and visibility fixups
 for _, child in ipairs(ToolsTab:GetChildren()) do
     if child:IsA("TextLabel") then
         child.Text = "Tools"
+        child.Size = UDim2.new(1, 0, 1, 0)
     elseif child:IsA("UIStroke") or child.Name == "InnerShadow" then
-        child.Transparency = 1 -- Start transparent like the others
+        child.Transparency = 1
     end
 end
 
