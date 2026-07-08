@@ -30,6 +30,7 @@ toolsFrame.ScrollBarThickness = 2
 toolsFrame.Visible = false
 toolsFrame.Parent = SectionContainers
 
+-- Add Layout to Tools Frame to stack buttons nicely
 local uiListLayout = Instance.new("UIListLayout")
 uiListLayout.Padding = UDim.new(0, 5)
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -41,22 +42,36 @@ uiPadding.PaddingLeft = UDim.new(0, 10)
 uiPadding.PaddingRight = UDim.new(0, 10)
 uiPadding.Parent = toolsFrame
 
-local TemplateTab = TabList:FindFirstChild("SettingsTab") or TabList:FindFirstChild("HomeTab")
-local ToolsTab = TemplateTab:Clone()
+local ToolsTab = Instance.new("TextButton")
 ToolsTab.Name = "ToolsTab"
-ToolsTab.BackgroundTransparency = 1 
-ToolsTab.Size = TemplateTab.Size
-ToolsTab.LayoutOrder = TemplateTab.LayoutOrder + 1
-ToolsTab.Parent = TabList
+ToolsTab.Text = "Tools"
+ToolsTab.Size = UDim2.new(0, 90, 1, 0)
+ToolsTab.BackgroundTransparency = 1
+ToolsTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ToolsTab.BorderSizePixel = 0
 
-for _, child in ipairs(ToolsTab:GetChildren()) do
-    if child:IsA("TextLabel") then
-        child.Text = "Tools"
-        child.Size = UDim2.new(1, 0, 1, 0)
-    elseif child:IsA("UIStroke") or child.Name == "InnerShadow" then
-        child.Transparency = 1
+if TabList:FindFirstChild("HomeTab") then
+    local templateText = TabList.HomeTab:FindFirstChildOfClass("TextLabel") or TabList.HomeTab
+    ToolsTab.Font = templateText.Font
+    ToolsTab.TextSize = templateText.TextSize
+    ToolsTab.TextColor3 = templateText.TextColor3
+    
+    for _, item in ipairs(TabList.HomeTab:GetChildren()) do
+        if item:IsA("UICorner") or item:IsA("UIStroke") then
+            item:Clone().Parent = ToolsTab
+        end
     end
 end
+if TabList:FindFirstChild("GameslistTab") then
+    ToolsTab.LayoutOrder = TabList.GameslistTab.LayoutOrder + 1
+else
+    ToolsTab.LayoutOrder = 3
+end
+ToolsTab.Parent = TabList
+
+local innerShadowMock = Instance.new("Folder")
+innerShadowMock.Name = "InnerShadow"
+innerShadowMock.Parent = ToolsTab
 
 local Sections = {
     Home = {
@@ -96,7 +111,7 @@ for _, sect in pairs(Sections) do
     sect.TabBtn.MouseEnter:Connect(function()
         for _, stroke in pairs(sect.TabBtn:GetChildren()) do
             if stroke.Name == "InnerShadow" then
-                stroke.Transparency = 0.95
+                pcall(function() stroke.Transparency = 0.95 end)
             end
         end
     end)
@@ -104,7 +119,7 @@ for _, sect in pairs(Sections) do
     sect.TabBtn.MouseLeave:Connect(function()
         for _, stroke in pairs(sect.TabBtn:GetChildren()) do
             if stroke.Name == "InnerShadow" then
-                stroke.Transparency = 1
+                pcall(function() stroke.Transparency = 1 end)
             end
         end
     end)
